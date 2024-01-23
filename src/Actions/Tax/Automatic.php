@@ -7,6 +7,10 @@ use Illuminate\Support\Str;
 use Stripe\StripeClient;
 use Stripe\Tax\Calculation;
 
+/**
+ * @resource https://support.stripe.com/questions/understanding-stripe-tax-pricing
+ */
+
 class Automatic
 {
     public static function run(Order $order): Calculation
