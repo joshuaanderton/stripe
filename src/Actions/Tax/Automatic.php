@@ -2,7 +2,6 @@
 
 namespace Ja\Stripe\Actions\Tax;
 
-use App\Models\Order;
 use Illuminate\Support\Str;
 use Stripe\StripeClient;
 use Stripe\Tax\Calculation;
@@ -13,43 +12,32 @@ use Stripe\Tax\Calculation;
 
 class Automatic
 {
-    public static function run(Order $order): Calculation
+    public static function run(array $products, string $currency, array $address, int $shippingCost): Calculation
     {
         $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
         $customerDetails = ['address_source' => 'billing'];
-        $cart = $order->cart;
 
-        if (! $address = $cart->billingAddress) {
-            $address = $cart->shippingAddress;
+        if ($address['is_billing'] === false) {
             $customerDetails['address_source'] = 'shipping';
         }
 
         if ($address) {
-            $customerDetails['address'] = $address->only([
+            $customerDetails['address'] = collect($address)->only([
                 'line1',
                 'line2',
                 'state',
                 'postal_code',
                 'country',
-            ]);
+            ])->toArray();
         } elseif (($ipAddress = request()->ip()) !== '127.0.0.1') {
             $customerDetails['ip_address'] = $ipAddress;
         }
 
-        $products = $order->products;
-        $products = $products->map(fn ($product) => [
-            'amount' => $product->price,
-            'quantity' => $product->pivot->quantity,
-            'reference' => $product->name,
-        ])->toArray();
-
-        $shippingPrice = $order->selectedShippingRate->price ?? 0;
-
         return $stripe->tax->calculations->create([
-            'currency' => Str::lower($cart->currency),
+            'currency' => Str::lower($currency),
             'customer_details' => $customerDetails,
             'line_items' => $products,
-            'shipping_cost' => ['amount' => $shippingPrice],
+            'shipping_cost' => ['amount' => $shippingCost],
             'expand' => ['line_items'],
         ]);
     }
