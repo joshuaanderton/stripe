@@ -123,7 +123,7 @@ class StripeProfileModel extends Model
                 'payouts' => [
                     'schedule' => [
                         'delay' => 4,
-                        'inteval' => 'weekly'
+                        'interval' => 'weekly'
                     ]
                 ]
             ]
