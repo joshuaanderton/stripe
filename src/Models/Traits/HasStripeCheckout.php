@@ -42,7 +42,6 @@ trait HasStripeCheckout
         return $this->stripeClient()->paymentIntents->retrieve($this->stripe_payment_intent_id);
     }
 
-
     public function updateStripePaymentIntent(): self
     {
         if (! $this->stripe_payment_intent_id) {
@@ -86,25 +85,7 @@ trait HasStripeCheckout
             return $this;
         }
 
-        $data = [
-            'amount' => $cart->total ?: 100,
-            'currency' => str($cart->currency)->lower(),
-            'setup_future_usage' => 'off_session',
-            'metadata' => ['internal_order_number' => $cart->number],
-            'transfer_group' => $cart->number,
-            'automatic_payment_methods' => ['enabled' => true],
-        ];
 
-        if ($stripeCustomerId = $cart->user?->stripe_customer_id) {
-            $data['customer'] = $stripeCustomerId;
-        }
-
-        $paymentIntent = $this->stripeClient()->paymentIntents->create($data);
-
-        $cart->update([
-            'stripe_payment_intent_id' => $paymentIntent->id,
-            'stripe_payment_intent_client_secret' => $paymentIntent->client_secret,
-        ]);
 
         return $this;
     }
