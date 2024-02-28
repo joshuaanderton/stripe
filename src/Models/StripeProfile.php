@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
 use Stripe\StripeClient;
 
-class StripeProfileModel extends Model
+class StripeProfile extends Model
 {
     use HasFactory;
 
@@ -112,6 +112,7 @@ class StripeProfileModel extends Model
             'email' => $this->team->owner->email,
             'capabilities' => [
                 'transfers' => ['requested' => true],
+                'card_payments' => ['requested' => true],
             ],
             'settings' => [
                 // 'branding' => [
@@ -121,9 +122,11 @@ class StripeProfileModel extends Model
                 //     'secondary_color' => $team->font_color,
                 // ],
                 'payouts' => [
+                    //'debit_negative_balances' => true,
                     'schedule' => [
-                        'delay' => 4,
-                        'interval' => 'weekly'
+                        'delay_days' => 7,
+                        'interval' => 'weekly',
+                        'weekly_anchor' => 'friday',
                     ]
                 ]
             ]
