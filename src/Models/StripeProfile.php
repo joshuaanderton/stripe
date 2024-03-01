@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Team;
 use Stripe\StripeClient;
 
 class StripeProfile extends Model
@@ -39,6 +40,11 @@ class StripeProfile extends Model
                 ->deleteStripeCustomer()
                 ->deleteStripeAccount()
         ));
+    }
+
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
     }
 
     private function stripeClient()
