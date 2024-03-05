@@ -31,9 +31,10 @@ class StripeProfile extends Model
 
     public static function booted(): void
     {
-        static::creating(fn ($stripeProfile) => (
-            $stripeProfile->createStripeCustomer()
-        ));
+        // static::creating(function ($stripeProfile) {
+        //     $stripeProfile->createStripeCustomer();
+        //     $stripeProfile->createStripeAccount();
+        // });
 
         static::deleting(fn ($stripeProfile) => (
             $stripeProfile
