@@ -44,7 +44,7 @@ trait HasStripeCheckout
 
     public function updateStripePaymentIntent(): self
     {
-        if (! $this->stripe_payment_intent_id) {
+        if (! $this->stripe_payment_intent_id || $this->total <= 0) {
             return $this;
         }
 
@@ -53,8 +53,8 @@ trait HasStripeCheckout
             : null;
 
         $data = array_merge([
-                'amount' => $this->total,
-                'currency' => str($this->currency)->lower(),
+            'amount' => $this->total,
+            'currency' => str($this->currency)->lower(),
         ], $shippingAddress === null ? [] : [
             'shipping' => [
                 'name' => $shippingAddress->name,

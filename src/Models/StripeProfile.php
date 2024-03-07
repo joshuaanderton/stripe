@@ -62,6 +62,10 @@ class StripeProfile extends Model
 
     public function stripeCustomer(): ?\Stripe\Customer
     {
+        if (! $this->stripe_customer_id) {
+            return null;
+        }
+
         if ($stripeCustomer = $this->stripeClient()->customers->retrieve($this->stripe_customer_id)) {
             Cache::put("stripe_customer_{$this->id}", $stripeCustomer->toJSON());
         }
@@ -92,14 +96,14 @@ class StripeProfile extends Model
         return json_decode($json);
     }
 
-    protected function createStripeCustomer(): self
+    public function createStripeCustomer(): self
     {
         $stripeCustomer = $this->stripeClient()->customers->create([
             'email' => $this->team->owner->email,
             'metadata' => ['team_id' => $this->team->id],
         ]);
 
-        $this->stripe_customer_id = $stripeCustomer->id;
+        $this->update(['stripe_customer_id' => $stripeCustomer->id]);
 
         return $this;
     }
@@ -113,7 +117,7 @@ class StripeProfile extends Model
 
     public function createStripeAccount(): self
     {
-        $stripeCustomer = $this->stripeClient()->accounts->create([
+        $stripeAccount = $this->stripeClient()->accounts->create([
             'type' => 'express',
             'country' => $this->country,
             'email' => $this->team->owner->email,
@@ -139,7 +143,7 @@ class StripeProfile extends Model
             ]
         ]);
 
-        $this->stripe_account_id = $stripeCustomer->id;
+        $this->update(['stripe_account_id' => $stripeAccount->id]);
 
         return $this;
     }
