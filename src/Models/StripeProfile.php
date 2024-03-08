@@ -148,13 +148,13 @@ class StripeProfile extends Model
         return $this;
     }
 
-    public function newAccountLinkUrl(): string
+    public function newAccountLinkUrl(string $returnUrl, string $refreshUrl): string
     {
         // $stripeAccount = $this->stripeAccount();
         $stripeAccountLink = $this->stripeClient()->accountLinks->create([
             'account' => $this->stripe_account_id,
-            'refresh_url' => route('shop.finances'),
-            'return_url' => route('shop.finances'),
+            'refresh_url' => $refreshUrl,
+            'return_url' => $returnUrl,
             'type' => 'account_onboarding',
             'collection_options' => [
                 'fields' => 'eventually_due',
