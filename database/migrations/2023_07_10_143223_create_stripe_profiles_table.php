@@ -22,8 +22,6 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->string('stripe_customer_id');
             $table->string('stripe_account_id')->nullable();
-            $table->string('country')->default('CA');
-            $table->boolean('delinquent')->default(false);
             $table->timestamps();
         });
     }

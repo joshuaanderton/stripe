@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Team;
+use Ja\Stripe\Actions\CreateStripeAccount;
+use Ja\Stripe\Actions\CreateStripeAccountLink;
 use Stripe\StripeClient;
 
 class StripeProfile extends Model
@@ -19,15 +21,10 @@ class StripeProfile extends Model
     protected $fillable = [
         'team_id',
         'stripe_customer_id',
-        'stripe_account_id',
-        'delinquent',
-        'country',
+        'stripe_account_id'
     ];
 
-    protected $casts = [
-        'team_id' => 'integer',
-        'delinquent' => 'boolean',
-    ];
+    protected $casts = ['team_id' => 'integer'];
 
     public static function booted(): void
     {
@@ -117,50 +114,23 @@ class StripeProfile extends Model
 
     public function createStripeAccount(): self
     {
-        $stripeAccount = $this->stripeClient()->accounts->create([
-            'type' => 'express',
-            'country' => $this->country,
-            'email' => $this->team->owner->email,
-            'capabilities' => [
-                'transfers' => ['requested' => true],
-                'card_payments' => ['requested' => true],
-            ],
-            'settings' => [
-                // 'branding' => [
-                //     'icon' => $team->icon_url,
-                //     'logo' => $team->logo_url,
-                //     'primary_color' => $team->background_color,
-                //     'secondary_color' => $team->font_color,
-                // ],
-                'payouts' => [
-                    //'debit_negative_balances' => true,
-                    'schedule' => [
-                        'delay_days' => 7,
-                        'interval' => 'weekly',
-                        'weekly_anchor' => 'friday',
-                    ]
-                ]
-            ]
-        ]);
-
-        $this->update(['stripe_account_id' => $stripeAccount->id]);
+        tap(CreateStripeAccount::run(
+            email: $this->team->owner->email,
+            country: $this->team->country
+        ), fn ($acct) => (
+            $this->update(['stripe_account_id' => $acct->id])
+        ));
 
         return $this;
     }
 
     public function newAccountLinkUrl(string $returnUrl, string $refreshUrl): string
     {
-        // $stripeAccount = $this->stripeAccount();
-        $stripeAccountLink = $this->stripeClient()->accountLinks->create([
-            'account' => $this->stripe_account_id,
-            'refresh_url' => $refreshUrl,
-            'return_url' => $returnUrl,
-            'type' => 'account_onboarding',
-            'collection_options' => [
-                'fields' => 'eventually_due',
-                'future_requirements' => 'include'
-            ],
-        ]);
+        $stripeAccountLink = CreateStripeAccountLink::run(
+            stripeAccountId: $this->stripe_account_id,
+            returnUrl: $returnUrl,
+            refreshUrl: $refreshUrl
+        );
 
         return $stripeAccountLink->url;
     }

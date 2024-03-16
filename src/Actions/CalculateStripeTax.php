@@ -1,6 +1,6 @@
 <?php
 
-namespace Ja\Stripe\Actions\Tax;
+namespace Ja\Stripe\Actions;
 
 use Illuminate\Support\Str;
 use Stripe\StripeClient;
@@ -10,7 +10,7 @@ use Stripe\Tax\Calculation;
  * @resource https://support.stripe.com/questions/understanding-stripe-tax-pricing
  */
 
-class Automatic
+class CalculateStripeTax
 {
     public static function run(array $products, string $currency, array $address, int $shippingCost): Calculation
     {
