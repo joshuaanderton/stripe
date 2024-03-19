@@ -17,7 +17,7 @@ class CreateStripeAccountLink
             'type' => 'account_onboarding',
             'collection_options' => [
                 'fields' => 'eventually_due',
-                'future_requirements' => 'include'
+                'future_requirements' => 'include',
             ],
         ]);
     }

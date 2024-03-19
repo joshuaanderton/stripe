@@ -2,12 +2,12 @@
 
 namespace Ja\Stripe\Models;
 
+use App\Models\Team;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Team;
 use Ja\Stripe\Actions\CreateStripeAccount;
 use Ja\Stripe\Actions\CreateStripeAccountLink;
 use Stripe\StripeClient;
@@ -21,7 +21,7 @@ class StripeProfile extends Model
     protected $fillable = [
         'team_id',
         'stripe_customer_id',
-        'stripe_account_id'
+        'stripe_account_id',
     ];
 
     protected $casts = ['team_id' => 'integer'];

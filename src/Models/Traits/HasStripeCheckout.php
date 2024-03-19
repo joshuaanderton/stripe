@@ -66,7 +66,7 @@ trait HasStripeCheckout
                     'postal_code',
                     'state',
                 ]),
-            ]
+            ],
         ]);
 
         $this
@@ -84,8 +84,6 @@ trait HasStripeCheckout
         if ($cart->stripe_payment_intent_id) {
             return $this;
         }
-
-
 
         return $this;
     }

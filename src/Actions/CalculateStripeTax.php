@@ -9,7 +9,6 @@ use Stripe\Tax\Calculation;
 /**
  * @resource https://support.stripe.com/questions/understanding-stripe-tax-pricing
  */
-
 class CalculateStripeTax
 {
     public static function run(array $products, string $currency, array $address, int $shippingCost): Calculation

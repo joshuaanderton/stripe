@@ -24,9 +24,9 @@ class CreateStripeAccount
                         'delay_days' => 7,
                         'interval' => 'weekly',
                         'weekly_anchor' => 'friday',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ]);
     }
 }
