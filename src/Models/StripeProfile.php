@@ -22,6 +22,7 @@ class StripeProfile extends Model
         'team_id',
         'stripe_customer_id',
         'stripe_account_id',
+        'stripe_plan_id',
     ];
 
     protected $casts = ['team_id' => 'integer'];
