@@ -57,6 +57,26 @@ class StripeProfile extends Model
         );
     }
 
+    public function stripeCustomerSubscriptions(): array
+    {
+        if (! $this->stripe_customer_id) {
+            return [];
+        }
+
+        if ($stripeCustomerSubscriptions = $this->stripeClient()->subscriptions->all(['customer' => $this->stripe_customer_id])?->data) {
+            Cache::put("stripe_customer_subscriptions_{$this->id}", json_encode($stripeCustomerSubscriptions));
+        }
+
+        return $stripeCustomerSubscriptions;
+    }
+
+    public function getStripeCustomerSubscriptionsAttribute(): array
+    {
+        $json = Cache::get("stripe_customer_subscriptions_{$this->id}", fn () => json_encode($this->stripeCustomerSubscriptions()));
+
+        return json_decode($json);
+    }
+
     public function stripeCustomer(): ?\Stripe\Customer
     {
         if (! $this->stripe_customer_id) {
