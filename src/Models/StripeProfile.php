@@ -57,22 +57,22 @@ class StripeProfile extends Model
         );
     }
 
-    public function stripeCustomerSubscriptions(): array
+    public function stripeSubscriptions(): array
     {
         if (! $this->stripe_customer_id) {
             return [];
         }
 
-        if ($stripeCustomerSubscriptions = $this->stripeClient()->subscriptions->all(['customer' => $this->stripe_customer_id])?->data) {
-            Cache::put("stripe_customer_subscriptions_{$this->id}", json_encode($stripeCustomerSubscriptions));
+        if ($stripeSubscriptions = $this->stripeClient()->subscriptions->all(['customer' => $this->stripe_customer_id])?->data) {
+            Cache::put("stripe_customer_subscriptions_{$this->id}", json_encode($stripeSubscriptions));
         }
 
-        return $stripeCustomerSubscriptions;
+        return $stripeSubscriptions;
     }
 
-    public function getStripeCustomerSubscriptionsAttribute(): array
+    public function getStripeSubscriptionsAttribute(): array
     {
-        $json = Cache::get("stripe_customer_subscriptions_{$this->id}", fn () => json_encode($this->stripeCustomerSubscriptions()));
+        $json = Cache::get("stripe_customer_subscriptions_{$this->id}", fn () => json_encode($this->stripeSubscriptions()));
 
         return json_decode($json);
     }
