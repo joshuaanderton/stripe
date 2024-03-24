@@ -22,6 +22,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
             $table->string('stripe_customer_id');
             $table->string('stripe_account_id')->nullable();
+            $table->string('stripe_plan_id')->nullable();
             $table->timestamps();
         });
     }
