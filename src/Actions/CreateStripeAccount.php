@@ -8,7 +8,7 @@ class CreateStripeAccount
 {
     public static function run(string $email, string $country): \Stripe\Account
     {
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
 
         return $stripe->accounts->create([
             'type' => 'express',

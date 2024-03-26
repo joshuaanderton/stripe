@@ -10,7 +10,7 @@ trait HasStripeCheckout
 {
     private function stripeClient()
     {
-        return new StripeClient(env('STRIPE_SECRET_KEY'));
+        return new StripeClient(env('STRIPE_SECRET'));
     }
 
     public function stripePaymentIntentSucceeded(): bool

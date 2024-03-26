@@ -18,7 +18,7 @@ class CalculateStripeTax
             throw new InvalidArgumentException('Either customer address or IP address must be provided');
         }
 
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
         $customerDetails = collect();
 
         if ($customerAddress) {

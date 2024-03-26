@@ -8,7 +8,7 @@ class CreateStripeAccountLink
 {
     public static function run(string $stripeAccountId, string $returnUrl, string $refreshUrl): \Stripe\AccountLink
     {
-        $stripe = new StripeClient(env('STRIPE_SECRET_KEY'));
+        $stripe = new StripeClient(env('STRIPE_SECRET'));
 
         return $stripe->accountLinks->create([
             'account' => $stripeAccountId,

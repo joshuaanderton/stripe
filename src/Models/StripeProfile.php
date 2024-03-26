@@ -20,24 +20,15 @@ class StripeProfile extends Model
 
     protected $fillable = [
         'team_id',
-        'stripe_customer_id',
         'stripe_account_id',
-        'stripe_plan_id',
     ];
 
     protected $casts = ['team_id' => 'integer'];
 
     public static function booted(): void
     {
-        // static::creating(function ($stripeProfile) {
-        //     $stripeProfile->createStripeCustomer();
-        //     $stripeProfile->createStripeAccount();
-        // });
-
         static::deleting(fn ($stripeProfile) => (
-            $stripeProfile
-                ->deleteStripeCustomer()
-                ->deleteStripeAccount()
+            $stripeProfile->deleteStripeAccount()
         ));
     }
 
@@ -48,7 +39,7 @@ class StripeProfile extends Model
 
     private function stripeClient()
     {
-        return new StripeClient(env('STRIPE_SECRET_KEY'));
+        return new StripeClient(env('STRIPE_SECRET'));
     }
 
     protected function currency(): Attribute
@@ -56,46 +47,6 @@ class StripeProfile extends Model
         return new Attribute(
             get: fn (): string => (string) str($this->stripeAccount->default_currency ?: 'CAD')->upper()
         );
-    }
-
-    public function stripeSubscriptions(): array
-    {
-        if (! $this->stripe_customer_id) {
-            return [];
-        }
-
-        if ($stripeSubscriptions = $this->stripeClient()->subscriptions->all(['customer' => $this->stripe_customer_id])?->data) {
-            Cache::put("stripe_customer_subscriptions_{$this->id}", json_encode($stripeSubscriptions));
-        }
-
-        return $stripeSubscriptions;
-    }
-
-    public function getStripeSubscriptionsAttribute(): array
-    {
-        $json = Cache::get("stripe_customer_subscriptions_{$this->id}", fn () => json_encode($this->stripeSubscriptions()));
-
-        return json_decode($json);
-    }
-
-    public function stripeCustomer(): ?\Stripe\Customer
-    {
-        if (! $this->stripe_customer_id) {
-            return null;
-        }
-
-        if ($stripeCustomer = $this->stripeClient()->customers->retrieve($this->stripe_customer_id)) {
-            Cache::put("stripe_customer_{$this->id}", $stripeCustomer->toJSON());
-        }
-
-        return $stripeCustomer;
-    }
-
-    public function getStripeCustomerAttribute(): ?object
-    {
-        $json = Cache::get("stripe_customer_{$this->id}", fn () => $this->stripeCustomer()?->toJSON());
-
-        return json_decode($json);
     }
 
     public function stripeAccount(): ?\Stripe\Account
@@ -112,25 +63,6 @@ class StripeProfile extends Model
         $json = Cache::get("stripe_account_{$this->id}", fn () => $this->stripeAccount()?->toJSON());
 
         return json_decode($json);
-    }
-
-    public function createStripeCustomer(): self
-    {
-        $stripeCustomer = $this->stripeClient()->customers->create([
-            'email' => $this->team->owner->email,
-            'metadata' => ['team_id' => $this->team->id],
-        ]);
-
-        $this->update(['stripe_customer_id' => $stripeCustomer->id]);
-
-        return $this;
-    }
-
-    protected function deleteStripeCustomer(): self
-    {
-        $this->stripeClient()->customers->delete($this->stripe_customer_id);
-
-        return $this;
     }
 
     public function createStripeAccount(): self
