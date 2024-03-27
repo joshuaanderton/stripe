@@ -76,15 +76,4 @@ trait HasStripeCheckout
 
         return $this;
     }
-
-    public function createStripePaymentIntent(): self
-    {
-        $cart = $this;
-
-        if ($cart->stripe_payment_intent_id) {
-            return $this;
-        }
-
-        return $this;
-    }
 }
