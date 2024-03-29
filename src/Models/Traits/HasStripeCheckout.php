@@ -44,35 +44,13 @@ trait HasStripeCheckout
 
     public function updateStripePaymentIntent(): self
     {
-        if (! $this->stripe_payment_intent_id || $this->total <= 0) {
-            return $this;
-        }
-
-        $shippingAddress = $this->shipping_address_id
-            ? $this->shippingAddress()->first()
-            : null;
-
-        $data = array_merge([
-            'amount' => $this->total,
-            'currency' => str($this->currency)->lower(),
-        ], $shippingAddress === null ? [] : [
-            'shipping' => [
-                'name' => $shippingAddress->name,
-                'address' => $shippingAddress->only([
-                    'line1',
-                    'line2',
-                    'city',
-                    'country',
-                    'postal_code',
-                    'state',
-                ]),
-            ],
-        ]);
-
         $this
             ->stripeClient()
             ->paymentIntents
-            ->update($this->stripe_payment_intent_id, $data);
+            ->update($this->stripe_payment_intent_id, [
+                'amount' => $this->total ?: 100, // Total needs to be at least 100 cents
+                'currency' => str($this->currency)->lower(),
+            ]);
 
         return $this;
     }
