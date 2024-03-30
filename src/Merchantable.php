@@ -38,11 +38,11 @@ trait Merchantable
         return json_decode($json);
     }
 
-    public function createStripeAccount(): self
+    public function createStripeAccount(string $email, string $country): self
     {
         tap(CreateStripeAccount::run(
-            email: $this->team->owner->email,
-            country: $this->team->country
+            email: $email,
+            country: $country
         ), fn ($acct) => (
             $this->update(['stripe_account_id' => $acct->id])
         ));

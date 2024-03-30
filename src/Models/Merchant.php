@@ -12,6 +12,8 @@ class Merchant extends Model
 {
     use HasFactory, Merchantable;
 
+    protected $fillable = ['stripe_account_id'];
+
     public static function booted(): void
     {
         static::deleting(fn ($merchant) => (
