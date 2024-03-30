@@ -1,42 +1,15 @@
 <?php
 
-namespace Ja\Stripe\Models;
+namespace Ja\Stripe;
 
-use App\Models\Team;
+use Stripe\StripeClient;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
 use Ja\Stripe\Actions\CreateStripeAccount;
 use Ja\Stripe\Actions\CreateStripeAccountLink;
-use Stripe\StripeClient;
 
-class StripeProfile extends Model
+trait Merchantable
 {
-    use HasFactory;
-
-    public $table = 'stripe_profiles';
-
-    protected $fillable = [
-        'team_id',
-        'stripe_account_id',
-    ];
-
-    protected $casts = ['team_id' => 'integer'];
-
-    public static function booted(): void
-    {
-        static::deleting(fn ($stripeProfile) => (
-            $stripeProfile->deleteStripeAccount()
-        ));
-    }
-
-    public function team(): BelongsTo
-    {
-        return $this->belongsTo(Team::class);
-    }
-
     private function stripeClient()
     {
         return new StripeClient(env('STRIPE_SECRET'));
